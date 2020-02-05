@@ -1,0 +1,57 @@
+Options +FollowSymLinks
+RewriteEngine on
+RewriteBase /
+Options All -Indexes
+
+RewriteCond %{REQUEST_FILENAME} -s [OR]
+RewriteCond %{REQUEST_FILENAME} -l [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+
+RewriteCond %{QUERY_STRING} (\<|%3C).*script.*(\>|%3E) [NC,OR]
+RewriteCond %{QUERY_STRING} GLOBALS(=|\[|\%[0-9A-Z]{0,2}) [OR]
+RewriteCond %{QUERY_STRING} _REQUEST(=|\[|\%[0-9A-Z]{0,2})
+
+RewriteRule ^resource/(.*)$ resource/$1 [L]
+RewriteRule ^.*$ [NC,L]
+RewriteRule ^.*$ index.php [NC,L]
+
+# Предотвращение кликджекинга
+<IfModule headers_module>
+	Header set X-Frame-Options SAMEORIGIN
+</IfModule>
+
+# Предотвращение XSS-атак
+<IfModule mod_headers.c>
+    Header set X-XSS-Protection "1; mode=block"
+</IfModule>
+
+# предотвращение атаки с использованием подмены MIME типов
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options nosniff
+</IfModule>
+
+# предотвращения взаимодействия скриптов с куками
+<IfModule mod_headers.so>
+    Header edit Set-Cookie ^(.*)$ $1;HttpOnly;Secure
+</IfModule>
+
+# Кэширование страниц
+# 1 ГОД
+<FilesMatch "\.(ico|pdf|flv)$">
+    Header set Cache-Control "max-age=29030400, public"
+</FilesMatch>
+
+# 1 НЕДЕЛЯ
+<FilesMatch "\.(jpg|jpeg|png|gif|swf)$">
+    Header set Cache-Control "max-age=604800, public"
+</FilesMatch>
+
+# 2 ДНЯ
+<FilesMatch "\.(xml|txt|css|js)$">
+    Header set Cache-Control "max-age=172800, proxy-revalidate"
+</FilesMatch>
+
+# 1 МИНУТА
+<FilesMatch "\.(html|htm|php)$">
+    Header set Cache-Control "max-age=60, private, proxy-revalidate"
+</FilesMatch>

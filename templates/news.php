@@ -1,0 +1,1 @@
+<? include "includes/header.php"; ?>	<div class = "container marketing">		<section>			<h1><? echo $results['article'] ['title'] ?></h1>						<? echo $results['article'] ['summary'] ?>						<? echo $results['article'] ['article'] ?>		</section><? include "includes/footer.php"; ?>
